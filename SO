@@ -1,0 +1,59 @@
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class VerificaNumerosPrimos {
+
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.out.println("Uso: java VerificaNumerosPrimos <lista-de-numeros>");
+            return;
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(args.length);
+
+        for (String arg : args) {
+            int number = Integer.parseInt(arg);
+            Runnable worker = new VerificadorPrimo(number);
+            executorService.execute(worker);
+        }
+
+        executorService.shutdown();
+    }
+
+    static class VerificadorPrimo implements Runnable {
+        private final int number;
+
+        public VerificadorPrimo(int number) {
+            this.number = number;
+        }
+
+        @Override
+        public void run() {
+            if (isPrime(number)) {
+                System.out.println("O número " + number + " é primo.");
+            } else {
+                System.out.println("O número " + number + " não é primo.");
+            }
+        }
+
+        private boolean isPrime(int n) {
+            if (n <= 1) {
+                return false;
+            }
+            if (n <= 3) {
+                return true;
+            }
+            if (n % 2 == 0 || n % 3 == 0) {
+                return false;
+            }
+
+            for (int i = 5; i * i <= n; i += 6) {
+                if (n % i == 0 || n % (i + 2) == 0) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+}
